@@ -26,7 +26,7 @@ void setup()
 
 void loop()
 {
-  for (int ch = 0; ch < 4; ch++)
+  for (int ch = 0; ch < mx.getChannels(); ch++)
   {
     for (int value = 0; value < 256; value++)
     {

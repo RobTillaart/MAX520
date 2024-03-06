@@ -56,13 +56,13 @@ unittest(test_begin)
   MAX520 mx0(0x38);
   Wire.begin();
   mx0.begin();
-  AssertEqual(4, mx0.getChannels());
+  assertEqual(4, mx0.getChannels());
 
 
   MAX521 mx1(0x38);
   Wire.begin();
   mx1.begin();
-  AssertEqual(8, mx1.getChannels());
+  assertEqual(8, mx1.getChannels());
 }
 
 
