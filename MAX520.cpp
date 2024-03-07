@@ -79,7 +79,8 @@ int MAX520::write(uint8_t channel, uint8_t value)
 }
 
 
-//  TODO optimize. page 11 figure 7
+//  Can be optimized with one I2C transaction.
+//  page 11 figure 7
 int MAX520::write(uint8_t * values)
 {
   for (int i = 0; i < _channels; i++)

@@ -21,13 +21,13 @@ Arduino library for MAX520 and MAX521 4/8 channel 8 bit DAC.
 The MAX520 is a 4 channel 8 bit DAC. The 520 has no output buffer amplifiers, 
 giving it low supply current. See datasheet for details.
 
-The output range of the MAX520 4 DACs depends on the 4 VREF inputs.
+The output range of the MAX520 4 DACs depends on the **FOUR** VREF inputs.
 You can have e.g. one from 0.0-5.0V, one from 0.0-3.3V and two from 0.0-2.5V.
 This provides a flexibility, many other DAC's do not have.
 
 The MAX520 is a write only device, so the library provides a cache of the last 
-written values per DAC. These cached values are set to 0 when begin() is called. 
-At startup and after reset the outputs of the 4 DAC's are 0V.
+written values per DAC. These cached values are set to 0 when **begin()** is called. 
+At startup and after **reset()** the outputs of the 4 DAC's are 0V.
 
 The MAX521 is an 8 channel 8 bit DAC. The 521 has output amplifiers to they can
 provide more current. See datasheet for details.
@@ -48,14 +48,14 @@ After calling **begin()** the user has to write the values per DAC.
 |  MAX521  |  OUT_1    |  VREF_1  |     Y      |   6    |
 |  MAX521  |  OUT_2    |  VREF_2  |     Y      |   6    |
 |  MAX521  |  OUT_3    |  VREF_3  |     Y      |   6    |
-|  MAX521  |  OUT_4..7 |  VREF_4  |     Y      |   6    |  shared  |
+|  MAX521  |  OUT_4..7 |  VREF_4  |     Y      |   6    |  shared VREF4  |
 
-_time = time to settle a value in us_
+_time = time to settle a value in microseconds_
 
 The MAX52x comes in various types with different working ranges (e.g. temperature).
 See datasheet for details.
 
-As always feedback about the behaviour is welcome.
+As always feedback about the library or device behaviour is welcome.
 
 
 #### Related
@@ -74,22 +74,33 @@ As always feedback about the behaviour is welcome.
 
 #### I2C addresses
 
-|  device  |  address pins  |  addresses   |
-|:--------:|:--------------:|:------------:|
-|  MAX520  |     3          |  0x20..0x27  |
-|  MAX521  |     2          |  0x20..0x23  |
+|  Device  |  Address pins  |  Address range   |
+|:--------:|:--------------:|:----------------:|
+|  MAX520  |     3          |    0x20..0x27    |
+|  MAX521  |     2          |    0x20..0x23    |
 
 
 #### I2C Performance
 
 The devices are rated up to 400 KHz. Given that setting a DAC takes 3 bytes
-+ some ACK bits a maximum update is theoretical in the order of 10 KHz for 
-one channel.
-
-No hardware test is done yet to measure performance.
+and some ACK bits a maximum update speed is theoretical in the order of 
+10 KHz for one channel (or 2.5 KHz for 4 channels). 
+As it is possible to **write(array)** multiple channels in one transaction
+the actual numbers might be slightly higher.
 
 The settling time of a new value the MAX520 is 2 us and the MAX521 uses up 
 to 6 us. This faster than I2C can provide new values.
+
+
+TODO: No hardware test is done yet to measure performance.
+
+|  speed   |  write  (us)  |  Notes  |
+|:--------:|:-------------:|:-------:|
+|   50000  |               |
+|  100000  |               |
+|  200000  |               |
+|  300000  |               |
+|  400000  |               |  max datasheet
 
 
 #### I2C multiplexing
@@ -127,7 +138,7 @@ and the optional Wire interface as parameter.
 Returns false if the device cannot be seen on the I2C bus.
 - **bool isConnected()** checks if the address set in the constructor or by **setAddress()** is visible on the I2C bus.
 - **bool setAddress(uint8_t deviceAddress)** sets the device address after construction. 
-Can be used to switch between MAX520 modules runtime. Note this corrupts internal buffered values, 
+Can be used to switch between MAX520 modules runtime. Note this corrupts internal cached last written values, 
 so one might need to call **write()** again. Returns true if address can be found on I2C bus.
 - **uint8_t getAddress()** Returns the device address.
 - **uint8_t getChannels()** Returns the number of channels (4 or 8).
@@ -135,8 +146,9 @@ so one might need to call **write()** again. Returns true if address can be foun
 
 #### Read and Write
 
-- **int write(uint8_t channel, uint8_t value)** writes value to chosen DAC.
-- **int write(uint8_t \* values)** writes to all DACs. user must take care that the array is large enough (4/8).
+- **int write(uint8_t channel, uint8_t value)** writes a value 0..255 to the chosen DAC.
+- **int write(uint8_t \* values)** writes to all DACs. 
+The user must take care that the array is large enough to hold 4 or 8 values.
 - **int read(uint8_t channel)** returns the last written value to chosen DAC. (from cache).
 
 
@@ -146,7 +158,7 @@ so one might need to call **write()** again. Returns true if address can be foun
 - **int powerDown()** sets device in a low current mode.
 - **int wakeUp()** wakes up the device.
 
-TODO: investigate the actual behaviour of the devices in PD mode.
+TODO: investigate the actual behaviour of the devices in PD mode.  
 What effect does it have and are the cached values still actual / correct?
 
 Feedback welcome.
@@ -158,12 +170,11 @@ Feedback welcome.
 
 ## Error codes
 
-|  name                  |  value  |  description              |
+|  Name                  |  Value  |  Description              |
 |:-----------------------|:-------:|:--------------------------|
 |  MAX520_OK             |  0x00   |  no error                 |
 |  MAX520_CHANNEL_ERROR  |  0x81   |  channel nr out of range  |
 |  MAX520_I2C_ERROR      |  0x82   |  I2C communication error  |
-
 
 
 ## Future
@@ -185,6 +196,7 @@ Feedback welcome.
 - add **wakeUp(values)** ?  
 - add **powerDown(values)** ?
 - error handling
+- add **writeAll(value)** ?
 
 
 #### Wont

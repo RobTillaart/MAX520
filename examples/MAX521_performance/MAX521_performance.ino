@@ -28,7 +28,7 @@ void setup()
   Serial.println("Clock\tTime (us)");
   for (uint32_t speed = 50000; speed <= 500000; speed += 50000)
   {
-    test(speed);
+    test_1(speed);
   }
   Wire.setClock(100000);
   Serial.println("\done");
@@ -39,7 +39,7 @@ void loop()
 {
 }
 
-void test(uint32_t speed)
+void test_1(uint32_t speed)
 {
   //  wait to flush Serial
   delay(100);
@@ -52,10 +52,29 @@ void test(uint32_t speed)
   }
   uint32_t stop = micros();
 
+  Serial.print("Write(ch, value)");
+  Serial.print("\t");
   Serial.print(speed);
   Serial.print("\t");
   Serial.print((stop - start) / 256.0, 2);
   Serial.print("\n");
+  delay(100);
+
+  uint8_t values[8] = { 0, 42, 85, 127, 170, 212, 255 };
+  start = micros();
+  for (int value = 0; value < 10; value++)
+  {
+    mx.write(values);
+  }
+  stop = micros();
+
+  Serial.print("Write(values)");
+  Serial.print("\t");
+  Serial.print(speed);
+  Serial.print("\t");
+  Serial.print((stop - start) / 10.0, 2);
+  Serial.print("\n");
+  delay(100);
 }
 
 
