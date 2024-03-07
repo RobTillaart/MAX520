@@ -68,7 +68,7 @@ unittest(test_constructor)
 
   assertEqual(0x20, mx.getAddress());
   assertEqual(0x20, mx0.getAddress());
-  assertEqual(0x20, mx1.getAddress());
+  assertEqual(0x21, mx1.getAddress());
   assertEqual(0x22, mx2.getAddress());
   assertEqual(0x23, mx3.getAddress());
 
